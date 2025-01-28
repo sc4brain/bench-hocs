@@ -1,0 +1,13 @@
+load_file("nrngui.hoc")
+
+objref stim_sec, stim_vec
+create soma
+access soma
+
+stim_sec = soma
+
+stim_sec {
+    stim_vec = new Vector()
+    stim_vec.append(10)
+    stim_vec.printf()
+}

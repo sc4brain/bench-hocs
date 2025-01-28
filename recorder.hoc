@@ -1,0 +1,90 @@
+objref volt_list // record membrance potential
+objref volt_tvec // record time
+objref volt_vec  // record voltage
+
+proc setVoltageRecord() {local i,j, SynapsePrintOn
+    volt_tvec = new Vector()
+    volt_tvec.record(&t)
+    printf("setVoltageRecord() (pc.id:%d)\n",pc.id)
+    printf("SIZE OF VECTOR : %d\n",volt_tvec.buffer_size())
+    volt_list = new List()
+    
+    SynapsePrintOn = 0
+
+    for (j = 0; j<cells.count; j+=1) {
+//    if(j == 0){
+        volt_vec = new Vector()
+	volt_vec.record(&cells.object[j].dend[0].v(0.5))
+	volt_list.append(volt_vec)
+//    }
+    }
+}
+
+proc fprintVoltageRecord() {localobj mt, file
+    strdef filename
+    for(j = 0; j<cells.count();j+=1){
+//    if(j == 0){
+        mt = new Matrix()
+        file = new File()
+	sprint(filename,"values/%d.txt", j)
+        file.wopen(filename)
+//	volt_vec.printf(file)
+        mt.resize(volt_tvec.size(),2)
+        mt.setcol(0,volt_tvec)
+        mt.setcol(1,volt_list.o(j))
+        mt.fprint(file,"%5.5f\t")
+        file.close()
+//    }
+    }
+}
+
+proc fprintVoltageVecRecord() {localobj mt, vfile, tfile
+    strdef vfilename
+    strdef tfilename
+    for(j = 0; j<cells.count();j+=1){
+    if(j == 0){
+        vfile = new File()
+        sprint(vfilename,"values/%dv.dat", j)
+        vfile.wopen(vfilename)
+        volt_vec.vwrite(vfile)
+        vfile.close()
+
+        tfile = new File()
+        sprint(tfilename,"values/%dt.dat", j)
+        tfile.wopen(tfilename)
+        volt_tvec.vwrite(tfile)
+        tfile.close()
+    }
+    }
+}
+
+
+proc spikerecord(){local i localobj nc, nil
+    for (j = 0; j<cells.count; j+=1) {
+	cells.object[j].setSpikeRecord(0)
+    }
+}
+
+proc multiSpikeRecord(){local i localobj nc, nil
+    for (j = 0; j<cells.count; j+=1) {
+	cells.object[j].setMultiSpikeRecord(10,20,30,40)
+    }
+}
+/*
+proc spikeout(){
+    strdef sfilename
+    for (j = 0; j<cells.count; j+=1) {
+        sprint(sfilename, "values/%d", j)
+        // fprintSpikeRecord(SPIKEOUT_DIR, INTERVAL, STOPTIME)
+	cells.object[j].fprintSpikeRecord(sfilename,1,50)
+    }
+}
+*/
+proc multiSpikeout(){
+    strdef sfilename
+    for (j = 0; j<cells.count; j+=1) {
+        sprint(sfilename, "values/%d", j)
+        // fprintSpikeRecord(SPIKEOUT_DIR, INTERVAL, STOPTIME)
+	cells.object[j].fprintMultiSpikeRecord(j,1,50)
+    }
+}
