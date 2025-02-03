@@ -442,8 +442,10 @@ print "nccheck-finished"
  stdinit()
 //   start sim
 cvode.use_fast_imem(1)
-nrncore_write("-d coredat")
-pc.nrncore_run("--tstop 1000")
+//pc.nrnbbcore_write("coredat")
+pc.nrnbbcore_write()
+
+pc.nrncore_run("--mpi --. coredat")
 // pc.psolve(tstop)
  
  pc.barrier()
@@ -482,7 +484,7 @@ if(pc.id == 0){printf("finished all check")}
 
 // pc.runworker()
 
-rep_last=1
+rep_last=0
 if (rep_last){
  if(pc.id == 0){
     print"--------------------------last rep section-------------------------------\r\n"
