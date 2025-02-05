@@ -224,7 +224,8 @@ proc mkstim() { local i, num_stim_pos, stim_cell, num_cell, num_stim
 	    stim.interval = 30
             printf("stim num and intervael(%d,%d )", stim.number, stim.interval)		    
 	    ncstim = new NetCon(stim, pc.gid2cell(stim_cell).synlist.object(0))
-            //pc.set_gid2node(20000+i,
+	    // tadasii??
+            pc.set_gid2node(2000000+i,pc.id)
 	    ncstim.delay = 1
 
 	    //ncstim.weight = 3
@@ -443,7 +444,8 @@ print "nccheck-finished"
 //   start sim
 cvode.use_fast_imem(1)
 //pc.nrnbbcore_write("coredat")
-pc.nrnbbcore_write()
+pc.setup_transfer()
+pc.nrnbbcore_write("coredat")
 
 pc.nrncore_run("--mpi --. coredat")
 // pc.psolve(tstop)
