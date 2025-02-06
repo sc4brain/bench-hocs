@@ -1,11 +1,11 @@
-
+ 
 //{chdir("./hoc/bench")}
 
 {load_file("nrngui.hoc")}
 load_file("stdrun.hoc")
 CACHE_EFFICIENT=1
 // non zero ==ture
-Debug=1
+Debug = 1
 
 if (!name_declared("MODEL")) { MODEL=0 }
 if (!name_declared("NSTIM_POS")) { NSTIM_POS=1 }
@@ -225,7 +225,8 @@ proc mkstim() { local i, num_stim_pos, stim_cell, num_cell, num_stim
             printf("stim num and intervael(%d,%d )", stim.number, stim.interval)		    
 	    ncstim = new NetCon(stim, pc.gid2cell(stim_cell).synlist.object(0))
 	    // tadasii??
-            pc.set_gid2node(2000000+i,pc.id)
+           pc.set_gid2node(2000000+i,pc.id)
+	   pc.cell(2000000+i, ncstim)
 	    ncstim.delay = 1
 
 	    //ncstim.weight = 3
@@ -352,7 +353,7 @@ if (Debug){
   }
 print "nclistck ended"
 
-print "stim-lists"
+// print "stim-lists"
  for i = 0, stimlist.count - 1 {
     objref stim
     stim = stimlist.object(i)
@@ -410,18 +411,22 @@ print "nccheck-finished"
     //if(CACHE_EFFICIENT==1){ pc.multisplit() }
     
   pc.set_maxstep(5)
- {load_file("recorder.hoc")}
+if (!Debug){
+{load_file("recorder.hoc")}
 //      setVoltageRecord()
 //      spikerecord()
 
  svec = new Vector()
  sgidvec = new Vector()
  pc.spike_record(-1, svec, sgidvec) 
+}
+// test aftemaxstep end
+
+print "aftermaxstep"
 
 //    tstop = STOPTIME
 //    stdinit()
 //    tstop = STOPTIME
-
 
  if(pc.id == 0){ printf("[id:0] Modeling Finished.\n") }
  if(pc.id == 0){ printf("[id:0] Calculation Starts\n") }
@@ -444,10 +449,25 @@ print "nccheck-finished"
 //   start sim
 cvode.use_fast_imem(1)
 //pc.nrnbbcore_write("coredat")
+print "pre-transfer"
 pc.setup_transfer()
-pc.nrnbbcore_write("coredat")
+print "pre-write"
+//if(pc.id == 0){
+pc.nrnbbcore_write("/vol0301/data/hp230164/tkaz/codes/core2/nrn/hoc/coredat")
+//}
 
-pc.nrncore_run("--mpi --. coredat")
+
+if (Debug){
+if (system("test -d /vol0301/data/hp230164/tkaz/codes/core2/nrn/hoc/coredat") == 0) {
+    print "myfolder exist"
+} else {
+    print "no exist"
+}
+           }
+pc.barrier()
+//pc.nrncore_run("--mpi --. coredat")
+pc.nrncore_run("/vol0301/data/hp230164/tkaz/codes/core2/nrn/hoc/coredat")
+
 // pc.psolve(tstop)
  
  pc.barrier()
@@ -485,6 +505,7 @@ pc.nrncore_run("--mpi --. coredat")
 if(pc.id == 0){printf("finished all check")}
 
 // pc.runworker()
+
 
 rep_last=0
 if (rep_last){
